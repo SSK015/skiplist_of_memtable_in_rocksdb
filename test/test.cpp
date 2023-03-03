@@ -20,6 +20,6 @@ void loadOperation(string file, T& hashTable){
 }
 
 int main() {
-
+s
     return 0;
 }
