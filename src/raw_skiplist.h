@@ -36,12 +36,23 @@
 
 #include <atomic>
 
-#include "memory/allocator.h"
-#include "port/port.h"
-#include "util/random.h"
+#include "rocksdb/port.h"
+#include "rocksdb/random.h"
 
 namespace ROCKSDB_NAMESPACE {
 
+// from rocksdb/memory/Allocator.h
+class Allocator {
+ public:
+  virtual ~Allocator() {}
+
+  virtual char* Allocate(size_t bytes) = 0;
+  virtual char* AllocateAligned(size_t bytes, size_t huge_page_size = 0,
+                                Logger* logger = nullptr) = 0;
+
+  virtual size_t BlockSize() const = 0;
+};
+	
 template <typename Key, class Comparator>
 class SkipList {
  private:
