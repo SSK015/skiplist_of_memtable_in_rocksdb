@@ -6,9 +6,9 @@
 #include <set>
 
 #include "memory/arena.h"
-#include "rocksdb/env.h"
-#include "test_util/testharness.h"
-#include "util/hash.h"
+// #include "rocksdb/env.h"
+// #include "test_util/testharness.h"
+// #include "util/hash.h"
 #include "util/random.h"
 
 namespace ROCKSDB_NAMESPACE {
