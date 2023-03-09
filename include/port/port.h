@@ -13,9 +13,5 @@
 
 // Include the appropriate platform specific file below.  If you are
 // porting to a new platform, see "port_example.h" for documentation
-// of what the new port_<platform>.h file must provide.
-#if defined(ROCKSDB_PLATFORM_POSIX)
+// of what the new port_<platform>.h file must provide
 #include "port/port_posix.h"
-#elif defined(OS_WIN)
-#include "port/win/port_win.h"
-#endif
