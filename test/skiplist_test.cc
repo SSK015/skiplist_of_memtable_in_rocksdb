@@ -20,16 +20,16 @@
 
 namespace ROCKSDB_NAMESPACE {
 // read dataset op key value
-// void loadData(string file){
-//    ifstream fin(file);
-//    string op, key, field;
-//    while(fin >> op >> key >> field){
-//        char value[VALUE_SIZE+128];
-//        fin.read(value, 1);
-//        fin.getline(value, VALUE_SIZE+128, '\n');
-//    }
-//    fin.close();
-// }
+void loadData(std::string file){
+    std::ifstream fin(file);
+    std::string op, key, field;
+    while(fin >> op >> key >> field){
+  	char value[VALUE_SIZE+128];
+	fin.read(value, 1);
+	fin.getline(value, VALUE_SIZE+128, '\n');
+    }
+    fin.close();
+}
 
 // read dataset op key
 // vector<string> readSequence;
