@@ -7,6 +7,10 @@
 #include "InlineSkiplist.h"
 
 #include <set>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
 
 #include "memory/concurrent_arena.h"
 // #include "rocksdb/env.h"
