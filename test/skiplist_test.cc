@@ -1,7 +1,7 @@
 //  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
 //
 //  This file is a little different with original one in rocksdb As we use YCSB-generated data to test.
-#define VALUE_SIZE 128
+#define VALUE_SIZE 648
 #include "port/port.h"
 #include <gtest/gtest.h>
 #include "InlineSkiplist.h"
@@ -32,14 +32,14 @@ void loadData(std::string file){
 }
 
 // read dataset op key
-// vector<string> readSequence;
-// void loadOperation(string file){
-//   ifstream fin(file);
-//   string op, key;
-//   while(fin >> op >> key)
-//       readSequence.push_back(key);
-//   fin.close();
-// }
+std::vector<std::string> readSequence;
+void loadOperation(std::string file){
+    std::ifstream fin(file);
+    std::string op, key;
+    while(fin >> op >> key)
+        readSequence.push_back(key);
+    fin.close();
+}
 
 using Key = uint64_t;
 
@@ -131,6 +131,51 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
   ConcurrentArena arena;
   TestComparator cmp;
   InlineSkipList<TestComparator> list(cmp, &arena);
+
+//  std::ofstream file_out1("../data/insert_performance.txt", std::ios::app);
+//
+//    // 检查文件是否成功打开
+//  if (!file_out1.is_open()) {
+//        std::cout << "Error opening file!" << std::endl;
+//  }
+//
+//    // 写入数据
+//    int value = 0;
+//    for (int i = 0; i < 10; ++i) {
+//        value = i * 10;
+//        file_out1 << value << std::endl;
+//    }
+//
+//    // 关闭文件
+//
+//
+//
+//    std::ifstream fin(file);
+//    std::string op, key, field;
+//    while(fin >> op >> key >> field){
+//        char value[VALUE_SIZE+128];
+//        fin.read(value, 1);
+//        fin.getline(value, VALUE_SIZE+128, '\n');
+//
+//    }
+//
+//
+//  file_out1.close();
+//
+//  
+  
+  char buff[101] = "I am Joe Biden";
+//  list.Insert(buff);
+  for (int i = 0; i < N; i++) {
+    Key key = rnd.Next() % R;
+    if (keys.insert(key).second) {
+      char* buf = list.AllocateKey(sizeof(Key));
+      memcpy(buf, &key, sizeof(Key));
+      list.Insert(buf);
+    }
+  }
+
+
   for (int i = 0; i < N; i++) {
     Key key = rnd.Next() % R;
     if (keys.insert(key).second) {
