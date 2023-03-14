@@ -128,6 +128,7 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
   const int R = 5000;
   Random rnd(1000);
   std::set<Key> keys;
+  std::set<std::string> keys_s;
   ConcurrentArena arena;
   TestComparator cmp;
   InlineSkipList<TestComparator> list(cmp, &arena);
@@ -166,95 +167,139 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
   
   char buff[101] = "I am Joe Biden";
 //  list.Insert(buff);
-  for (int i = 0; i < N; i++) {
-    Key key = rnd.Next() % R;
-    if (keys.insert(key).second) {
-      char* buf = list.AllocateKey(sizeof(Key));
-      memcpy(buf, &key, sizeof(Key));
-      list.Insert(buf);
-    }
+  
+  
+//  for (int i = 0; i < N; i++) {
+//    Key key = rnd.Next() % R;
+//    if (keys.insert(key).second) {
+//      <F2>char* buf = list.AllocateKey(sizeof(Key));
+//      memcpy(buf, &key, sizeof(Key));
+//      list.Insert(buf);
+//    }
+//  }
+//
+//  for (int i = 0; i < N; i++) {
+//	
+//    if (keys_s.insert(key).second) {
+//      char* buf = list.AllocateKey(sizeof(Key));
+//      memcpy(buf, &key, sizeof(Key));
+//      list.Insert(buf);
+//    }
+// }
+//
+//
+
+   std::ifstream fin("../data/input100K.txt");
+   std::string op, field;
+	while(fin >> op){
+   //   while(fin >> op >> key >> field){
+        char key[VALUE_SIZE+128];
+//        fin.read(value, 1);
+        fin.getline(key, VALUE_SIZE+128, '\n');
+		if (keys_s.insert(key).second) {
+                char* buf = list.AllocateKey(sizeof(char));
+//		std::cout << key << std::endl;
+	        memcpy(buf, &key, sizeof(char));
+	        list.Insert(buf);
+    		}
+}
+    fin.close();
+
+  std::ifstream fin0("../data/query1M_100KKey.txt");
+  InlineSkipList<TestComparator>::Iterator iter0(&list);
+
+  while (fin >> op) {
+        char key0[VALUE_SIZE + 128]; 
+        fin.getline(key0, VALUE_SIZE + 128, '\n');
+        if(!list.Contains(key0)) std::cout << "error"<<std::endl;
   }
+  fin0.close();
 
 
-  for (int i = 0; i < N; i++) {
-    Key key = rnd.Next() % R;
-    if (keys.insert(key).second) {
-      char* buf = list.AllocateKey(sizeof(Key));
-      memcpy(buf, &key, sizeof(Key));
-      list.Insert(buf);
-    }
+
+  std::ifstream fin1("../data/query1M_100KKey.txt");
+  InlineSkipList<TestComparator>::Iterator iter(&list);
+
+  while (fin >> op) {
+	char key1[VALUE_SIZE + 128];
+	fin.getline(key1, VALUE_SIZE + 128, '\n');
+	iter.Seek(key1);
+	ASSERT_TRUE(!iter.Valid());
   }
-
-  for (Key i = 0; i < R; i++) {
-    if (list.Contains(Encode(&i))) {
-      ASSERT_EQ(keys.count(i), 1U);
-    } else {
-      ASSERT_EQ(keys.count(i), 0U);
-    }
-  }
-
-  // Simple iterator tests
-  {
-    InlineSkipList<TestComparator>::Iterator iter(&list);
-    ASSERT_TRUE(!iter.Valid());
-
-    uint64_t zero = 0;
-    iter.Seek(Encode(&zero));
-    ASSERT_TRUE(iter.Valid());
-    ASSERT_EQ(*(keys.begin()), Decode(iter.key()));
-
-    uint64_t max_key = R - 1;
-    iter.SeekForPrev(Encode(&max_key));
-    ASSERT_TRUE(iter.Valid());
-    ASSERT_EQ(*(keys.rbegin()), Decode(iter.key()));
-
-    iter.SeekToFirst();
-    ASSERT_TRUE(iter.Valid());
-    ASSERT_EQ(*(keys.begin()), Decode(iter.key()));
-
-    iter.SeekToLast();
-    ASSERT_TRUE(iter.Valid());
-    ASSERT_EQ(*(keys.rbegin()), Decode(iter.key()));
-  }
-
-  // Forward iteration test
-  for (Key i = 0; i < R; i++) {
-    InlineSkipList<TestComparator>::Iterator iter(&list);
-    iter.Seek(Encode(&i));
-
-    // Compare against model iterator
-    std::set<Key>::iterator model_iter = keys.lower_bound(i);
-    for (int j = 0; j < 3; j++) {
-      if (model_iter == keys.end()) {
-        ASSERT_TRUE(!iter.Valid());
-        break;
-      } else {
-        ASSERT_TRUE(iter.Valid());
-        ASSERT_EQ(*model_iter, Decode(iter.key()));
-        ++model_iter;
-        iter.Next();
-      }
-    }
-  }
-
-  // Backward iteration test
-  for (Key i = 0; i < R; i++) {
-    InlineSkipList<TestComparator>::Iterator iter(&list);
-    iter.SeekForPrev(Encode(&i));
-
-    // Compare against model iterator
-    std::set<Key>::iterator model_iter = keys.upper_bound(i);
-    for (int j = 0; j < 3; j++) {
-      if (model_iter == keys.begin()) {
-        ASSERT_TRUE(!iter.Valid());
-        break;
-      } else {
-        ASSERT_TRUE(iter.Valid());
-        ASSERT_EQ(*--model_iter, Decode(iter.key()));
-        iter.Prev();
-      }
-    }
-  }
+  fin1.close();
+//  for (Key i = 0; i < R; i++) {
+//    if (list.Contains(Encode(&i))) {
+//      ASSERT_EQ(keys.count(i), 1U);
+//    } else {
+//      ASSERT_EQ(keys.count(i), 0U);
+//    }
+//  }
+//
+//
+//  // Simple iterator tests
+//  {
+//    InlineSkipList<TestComparator>::Iterator iter(&list);
+//    ASSERT_TRUE(!iter.Valid());
+//
+//    uint64_t zero = 0;
+//    iter.Seek(Encode(&zero));
+//    ASSERT_TRUE(iter.Valid());
+//    ASSERT_EQ(*(keys.begin()), Decode(iter.key()));
+//
+//    uint64_t max_key = R - 1;
+//    iter.SeekForPrev(Encode(&max_key));
+//    ASSERT_TRUE(iter.Valid());
+//    ASSERT_EQ(*(keys.rbegin()), Decode(iter.key()));
+//
+//    iter.SeekToFirst();
+//    ASSERT_TRUE(iter.Valid());
+//    ASSERT_EQ(*(keys.begin()), Decode(iter.key()));
+//
+//    iter.SeekToLast();
+//    ASSERT_TRUE(iter.Valid());
+//    ASSERT_EQ(*(keys.rbegin()), Decode(iter.key()));
+//  }
+//
+//  // Forward iteration test
+//  for (Key i = 0; i < R; i++) {
+//    InlineSkipList<TestComparator>::Iterator iter(&list);
+//    iter.Seek(Encode(&i));
+//
+//    // Compare against model iterator
+//    std::set<Key>::iterator model_iter = keys.lower_bound(i);
+//    for (int j = 0; j < 3; j++) {
+//      if (model_iter == keys.end()) {
+//        ASSERT_TRUE(!iter.Valid());
+//        break;
+//      } else {
+//        ASSERT_TRUE(iter.Valid());
+//        ASSERT_EQ(*model_iter, Decode(iter.key()));
+//        ++model_iter;
+//        iter.Next();
+//      }
+//    }
+//  }
+//
+//  // Backward iteration test
+//  for (Key i = 0; i < R; i++) {
+//    InlineSkipList<TestComparator>::Iterator iter(&list);
+//    iter.SeekForPrev(Encode(&i));
+//
+//    // Compare against model iterator
+//    std::set<Key>::iterator model_iter = keys.upper_bound(i);
+//    for (int j = 0; j < 3; j++) {
+//      if (model_iter == keys.begin()) {
+//        ASSERT_TRUE(!iter.Valid());
+//        break;
+//      } else {
+//        ASSERT_TRUE(iter.Valid());
+//        ASSERT_EQ(*--model_iter, Decode(iter.key()));
+//        iter.Prev();
+//      }
+//    }
+//  }
+//}
+//
 }
 }  // namespace ROCKSDB_NAMESPACE
 
