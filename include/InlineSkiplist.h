@@ -799,11 +799,20 @@ void InlineSkipList<Comparator>::RecomputeSpliceLevels(const DecodedKey& key,
 
 template <class Comparator>
 template <bool UseCAS>
-bool InlineSkipList<Comparator>::Insert(const char* key, Splice* splice,
-                                        bool allow_partial_splice_fix) {
-  Node* x = reinterpret_cast<Node*>(const_cast<char*>(key)) - 1;
-  const DecodedKey key_decoded = compare_.decode_key(key);
+bool InlineSkipList<Comparator>::Insert(const char* keyy, Splice* splice, bool allow_partial_splice_fix) {
+//    std::cout << keyy << std::endl;
+//    char key[25];
+//    memcpy(key, keyy, 24);
+//    key[24] = '\0';
+  std::cout << keyy << std::endl;
+//  Node* x = reinterpret_cast<Node*>((const_cast<char*>keyy))) - 1;
+  const DecodedKey key_decoded = compare_.decode_key(keyy);
+//  key_decoded[24] = '\0';
+//  std::cout << key_decoded << std::endl;
+  Node* x = reinterpret_cast<Node*>((const_cast<char*>(keyy))) - 1; 
+  //const DecodedKey key_decoded = compare_.decode_key(keyy);
   int height = x->UnstashHeight();
+  std::cout << height << std::endl;
   assert(height >= 1 && height <= kMaxHeight_);
 
   int max_height = max_height_.load(std::memory_order_relaxed);
@@ -979,9 +988,9 @@ bool InlineSkipList<Comparator>::Insert(const char* key, Splice* splice,
     assert(splice->next_[splice->height_] == nullptr);
     for (int i = 0; i < splice->height_; ++i) {
       assert(splice->next_[i] == nullptr ||
-             compare_(key, splice->next_[i]->Key()) < 0);
+             compare_(keyy, splice->next_[i]->Key()) < 0);
       assert(splice->prev_[i] == head_ ||
-             compare_(splice->prev_[i]->Key(), key) <= 0);
+             compare_(splice->prev_[i]->Key(), keyy) <= 0);
       assert(splice->prev_[i + 1] == splice->prev_[i] ||
              splice->prev_[i + 1] == head_ ||
              compare_(splice->prev_[i + 1]->Key(), splice->prev_[i]->Key()) <

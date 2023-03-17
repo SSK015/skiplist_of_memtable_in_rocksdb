@@ -11,6 +11,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 #include "memory/concurrent_arena.h"
 // #include "rocksdb/env.h"
@@ -42,21 +43,31 @@ void loadOperation(std::string file){
 }
 
 using Key = uint64_t;
+using Value = std::string;
+using Key_new = std::string;
 
+char combine_kv[1001];
+//std::string combine_kv;
+//struct combine_kv {
+//   Key_new key;
+//   Value value;
+//};
 static const char* Encode(const uint64_t* key) {
   return reinterpret_cast<const char*>(key);
 }
-
-static Key Decode(const char* key) {
-  Key rv;
-  memcpy(&rv, key, sizeof(Key));
+char rv[25];
+static char* Decode(const char* key) {
+  memcpy(&rv, key, 24);
+  rv[24] = '\0';
   return rv;
 }
 
 struct TestComparator {
-  using DecodedType = Key;
+  using DecodedType = char*;
 
-  static DecodedType decode_key(const char* b) { return Decode(b); }
+  static DecodedType decode_key(const char* b) { 
+
+      return Decode(b); }
 
   int operator()(const char* a, const char* b) const {
     if (Decode(a) < Decode(b)) {
@@ -111,7 +122,7 @@ class InlineSkipTest : public testing::Test {
     iter.Seek(Encode(&zero));
     for (Key key : keys_) {
       ASSERT_TRUE(iter.Valid());
-      ASSERT_EQ(key, Decode(iter.key()));
+//      ASSERT_EQ(key, Decode(iter.key()));
       iter.Next();
     }
     ASSERT_FALSE(iter.Valid());
@@ -128,7 +139,7 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
   const int R = 5000;
   Random rnd(1000);
   std::set<Key> keys;
-  std::set<std::string> keys_s;
+  std::set<char *> keys_s;
   ConcurrentArena arena;
   TestComparator cmp;
   InlineSkipList<TestComparator> list(cmp, &arena);
@@ -191,42 +202,82 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
 
    std::ifstream fin("../data/input100K.txt");
    std::string op, field;
-	while(fin >> op){
+   char key[101];
+//   char value[500];
+   int qq = 0;
+   auto start_time = std::chrono::high_resolution_clock::now()      ;
+	while(fin >> op >> key >> field){
+	++qq;
    //   while(fin >> op >> key >> field){
-        char key[VALUE_SIZE+128];
-//        fin.read(value, 1);
-        fin.getline(key, VALUE_SIZE+128, '\n');
-		if (keys_s.insert(key).second) {
-                char* buf = list.AllocateKey(sizeof(char));
+        char value[501];
+        fin.read(value, 1);
+//	auto neww = new conbine_kv;
+    strcpy(combine_kv, key);
+//	combine_kv = key;
+        fin.getline(value, 501, '\n');
+
+        strcpy(combine_kv + 24, value);	
+//        combine_kv + 25 = value;
+//        std::cout << key << " " << value << std::endl;
+//        std::cout << sizeof(combine_kv) << std::endl;
+//        if (keys_s.insert(combine_kv).second) {
+        char* buf = list.AllocateKey(sizeof(combine_kv));
 //		std::cout << key << std::endl;
-	        memcpy(buf, &key, sizeof(char));
+	        memcpy(buf, combine_kv, sizeof(combine_kv));
+//            std::cout << buf << std::endl;
 	        list.Insert(buf);
-    		}
+//    		}
 }
     fin.close();
+  auto end_time = std::chrono::high_resolution_clock::now(); 
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+
+  std::cout << "Insert(micro seconds) : " << duration.count() / (double)qq << std::endl;
+
+  int count_data = 0;
 
   std::ifstream fin0("../data/query1M_100KKey.txt");
   InlineSkipList<TestComparator>::Iterator iter0(&list);
 
-  while (fin >> op) {
+  while (fin0 >> op) {
         char key0[VALUE_SIZE + 128]; 
-        fin.getline(key0, VALUE_SIZE + 128, '\n');
+        fin0.getline(key0, VALUE_SIZE + 128, '\n');
+	count_data++;
+
         if(!list.Contains(key0)) std::cout << "error"<<std::endl;
   }
+// here compute total_time / count_data = throughoutput
   fin0.close();
+  std::cout << count_data <<std::endl;
 
-
-
+//  std::cout << "aaaaa" << std::endl;
   std::ifstream fin1("../data/query1M_100KKey.txt");
   InlineSkipList<TestComparator>::Iterator iter(&list);
-
-  while (fin >> op) {
+//  start_time = std::chrono::high_resolution_clock::now(); 
+  int cnnt = 0;
+  while (fin1 >> op) {
+// initialize a timer here to count every query opreation time
 	char key1[VALUE_SIZE + 128];
-	fin.getline(key1, VALUE_SIZE + 128, '\n');
+//	std::cout << "sss" << std::endl;
+	fin1.getline(key1, VALUE_SIZE + 128, '\n');
+    start_time = std::chrono::high_resolution_clock::now()      ;
 	iter.Seek(key1);
-	ASSERT_TRUE(!iter.Valid());
-  }
-  fin1.close();
+	
+	
+	// timer end, and flush this time to an array;
+	ASSERT_TRUE(iter.Valid());
+    //std::cout << iter.key() << std::endl;
+  	end_time = std::chrono::high_resolution_clock::now();
+  	duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+    cnnt++;
+ //   std::cout << "Query(micro seconds) : " << duration.count() << std::endl;
+ }
+  fin1.close(); 
+// here open a new file under ../data, to store measured time array
+// use plt to draw a picture  
+// don not forget to close the file
+  std::cout << cnnt << std::endl;
+
 //  for (Key i = 0; i < R; i++) {
 //    if (list.Contains(Encode(&i))) {
 //      ASSERT_EQ(keys.count(i), 1U);
