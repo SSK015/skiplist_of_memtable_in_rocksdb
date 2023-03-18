@@ -42,7 +42,7 @@ void loadOperation(std::string file){
     fin.close();
 }
 
-using Key = uint64_t;
+using Key = char*;
 using Value = std::string;
 using Key_new = std::string;
 
@@ -52,7 +52,7 @@ char combine_kv[1001];
 //   Key_new key;
 //   Value value;
 //};
-static const char* Encode(const uint64_t* key) {
+static const char* Encode(const char* key) {
   return reinterpret_cast<const char*>(key);
 }
 char rv[25];
@@ -70,15 +70,25 @@ struct TestComparator {
       return Decode(b); }
 
   int operator()(const char* a, const char* b) const {
-    if (Decode(a) < Decode(b)) {
-      return -1;
-    } else if (Decode(a) > Decode(b)) {
-      return +1;
-    } else {
-      return 0;
-    }
+//    if (Decode(a) < Decode(b)) {
+//      return -1;
+//    } else if (Decode(a) > Decode(b)) {
+//      return +1;
+//    } else {
+//      return 0;
+//    }
+      auto state = strcmp(a, b);
+      if (state < 0) {
+	      return -1;
+  } else if (state > 0) {
+  	return 1;
+  } else {
+	  return 0;
+  }
   }
 
+  
+/*
   int operator()(const char* a, const DecodedType b) const {
     if (Decode(a) < b) {
       return -1;
@@ -88,29 +98,30 @@ struct TestComparator {
       return 0;
     }
   }
+  */
 };
 
 using TestInlineSkipList = InlineSkipList<TestComparator>;
 
 class InlineSkipTest : public testing::Test {
  public:
-  void Insert(TestInlineSkipList* list, Key key) {
+  void Insert(TestInlineSkipList* list, Key key, Key value) {
     char* buf = list->AllocateKey(sizeof(Key));
     memcpy(buf, &key, sizeof(Key));
-    list->Insert(buf);
+    list->Insert(buf, value);
     keys_.insert(key);
   }
 
-  bool InsertWithHint(TestInlineSkipList* list, Key key, void** hint) {
+  bool InsertWithHint(TestInlineSkipList* list, Key key, Key value, void** hint) {
     char* buf = list->AllocateKey(sizeof(Key));
     memcpy(buf, &key, sizeof(Key));
-    bool res = list->InsertWithHint(buf, hint);
+    bool res = list->InsertWithHint(buf, value, hint);
     keys_.insert(key);
     return res;
   }
 
-  void Validate(TestInlineSkipList* list) {
-    // Check keys exist.
+/*  void Validate(TestInlineSkipList* list) {
+//    // Check keys exist.
     for (Key key : keys_) {
       ASSERT_TRUE(list->Contains(Encode(&key)));
     }
@@ -129,7 +140,7 @@ class InlineSkipTest : public testing::Test {
     // Validate the list is well-formed.
     list->TEST_Validate();
   }
-
+*/
  private:
   std::set<Key> keys_;
 };
@@ -138,8 +149,9 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
   const int N = 2000;
   const int R = 5000;
   Random rnd(1000);
-  std::set<Key> keys;
-  std::set<char *> keys_s;
+//  std::set<std::string> keys;
+std::set<std::string, std::less<>> keys;
+//  std::set<char *> keys_s;
   ConcurrentArena arena;
   TestComparator cmp;
   InlineSkipList<TestComparator> list(cmp, &arena);
@@ -212,21 +224,34 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
         char value[501];
         fin.read(value, 1);
 //	auto neww = new conbine_kv;
-    strcpy(combine_kv, key);
+//    strcpy(combine_kv, key);
 //	combine_kv = key;
+	char combine_kv[25]; 
         fin.getline(value, 501, '\n');
-
-        strcpy(combine_kv + 24, value);	
+	strcpy(combine_kv, key);
+	combine_kv[24] = '\0';
+//        strcpy(combine_kv + 24, value);	
+//	strcpy(combine_kv + 501, key);
 //        combine_kv + 25 = value;
 //        std::cout << key << " " << value << std::endl;
-//        std::cout << sizeof(combine_kv) << std::endl;
-//        if (keys_s.insert(combine_kv).second) {
-        char* buf = list.AllocateKey(sizeof(combine_kv));
-//		std::cout << key << std::endl;
-	        memcpy(buf, combine_kv, sizeof(combine_kv));
+//        std::cout << sizeof(combine_kv) << std::endl;i
+// 	std::cout << combine_kv << std::endl;
+        if (keys.insert(combine_kv).second) {
+		char* buf = list.AllocateKey(sizeof(combine_kv));
+    		memcpy(buf, combine_kv, sizeof(combine_kv));  // 将复制后的内容写入 buf
+    		buf[24] = '\0';  // 添加字符串结束符
+		
+ //  		std::cout << std::string(buf) << std::endl;
+    		list.Insert(buf, value);  // 将 buf 的地址传递给 Insert() 函数
+  //      char* buf = list.AllocateKey(sizeof(combine_kv));
+//		std::cout << sizeof(combine_kv) << std::endl;
+
+//	        memcpy(buff, combine_kv, sizeof(combine_kv));
 //            std::cout << buf << std::endl;
-	        list.Insert(buf);
-//    		}
+//		buff[24] = '\0';
+//		std::cout << buf << std::endl;	
+//	        list.Insert(buf);
+    		}
 }
     fin.close();
   auto end_time = std::chrono::high_resolution_clock::now(); 
@@ -237,10 +262,11 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
   int count_data = 0;
 
   std::ifstream fin0("../data/query1M_100KKey.txt");
-  InlineSkipList<TestComparator>::Iterator iter0(&list);
-
+//  InlineSkipList<TestComparator>::Iterator iter0(&list);
+	list.TEST_Validate();
   while (fin0 >> op) {
-        char key0[VALUE_SIZE + 128]; 
+        char key0[VALUE_SIZE + 128];
+        fin0.read(key0, 1);	
         fin0.getline(key0, VALUE_SIZE + 128, '\n');
 	count_data++;
 
@@ -252,21 +278,28 @@ TEST_F(InlineSkipTest, InsertAndLookup) {
 
 //  std::cout << "aaaaa" << std::endl;
   std::ifstream fin1("../data/query1M_100KKey.txt");
-  InlineSkipList<TestComparator>::Iterator iter(&list);
+//  InlineSkipList<TestComparator>::Iterator iter(&list);
 //  start_time = std::chrono::high_resolution_clock::now(); 
   int cnnt = 0;
+  char key00[20];
   while (fin1 >> op) {
 // initialize a timer here to count every query opreation time
 	char key1[VALUE_SIZE + 128];
 //	std::cout << "sss" << std::endl;
+	fin1.read(key00, 1);
 	fin1.getline(key1, VALUE_SIZE + 128, '\n');
+//	std::cout << key1 << std::endl;
     start_time = std::chrono::high_resolution_clock::now()      ;
+ 	InlineSkipList<TestComparator>::Iterator iter(&list);
+  	
 	iter.Seek(key1);
-	
-	
+//	iter.Next();
+//        iter.SeekToLast();
+//
+//        iter.RandomSeek();
 	// timer end, and flush this time to an array;
 	ASSERT_TRUE(iter.Valid());
-    //std::cout << iter.key() << std::endl;
+    std::cout << iter.value() << std::endl;
   	end_time = std::chrono::high_resolution_clock::now();
   	duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     cnnt++;
