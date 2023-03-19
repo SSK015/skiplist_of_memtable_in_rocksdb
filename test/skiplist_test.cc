@@ -341,7 +341,7 @@ std::set<std::string, std::less<>> keys;
 // use plt to draw a picture  
 // don not forget to close the file
   std::cout << cnnt << std::endl;
-  std::ofstream output("output.txt", std::ios::out);
+  std::ofstream output("../output.txt", std::ios::out);
     if (!output) {
         std::cout << "Failed to open output.txt" << std::endl;
     }
