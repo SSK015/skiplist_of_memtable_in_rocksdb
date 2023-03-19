@@ -845,8 +845,10 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char* value, Splice* s
 //    key[24] = '\0';
 //  std::cout << keyy << std::endl;
   Node* x = reinterpret_cast<Node*>((const_cast<char*>(keyy))) - 1;
-//  x->Update(value);
-  memcpy(x->value, value, sizeof(value));
+//  x->Update(value);i
+//  std::cout << sizeof(value) << std::endl;
+ 
+  memcpy(x->value, value, 64);
   const DecodedKey key_decoded = compare_.decode_key(keyy);
 //  key_decoded[24] = '\0';
 	
@@ -854,9 +856,9 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char* value, Splice* s
 //  Node* x = reinterpret_cast<Node*>((const_cast<char*>(keyy))) - 1; 
   //const DecodedKey key_decoded = compare_.decode_key(keyy);
   int height = x->UnstashHeight();
-  //std::cout << height << std::endl;
+//  std::cout << height << std::endl;
   assert(height >= 1 && height <= kMaxHeight_);
-  std::cout << x->Key() <<std::endl;
+  //std::cout << x->Key() <<std::endl;
   int max_height = max_height_.load(std::memory_order_relaxed);
   while (height > max_height) {
     if (max_height_.compare_exchange_weak(max_height, height)) {

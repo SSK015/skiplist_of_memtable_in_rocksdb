@@ -218,6 +218,7 @@ std::set<std::string, std::less<>> keys;
 //   char value[500];
    int qq = 0;
    auto start_time = std::chrono::high_resolution_clock::now()      ;
+   char val[10001][101];
 	while(fin >> op >> key >> field){
 	++qq;
    //   while(fin >> op >> key >> field){
@@ -299,11 +300,11 @@ std::set<std::string, std::less<>> keys;
 //        iter.RandomSeek();
 	// timer end, and flush this time to an array;
 	ASSERT_TRUE(iter.Valid());
-    std::cout << iter.value() << std::endl;
+//    std::cout << iter.value() << std::endl;
   	end_time = std::chrono::high_resolution_clock::now();
   	duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     cnnt++;
- //   std::cout << "Query(micro seconds) : " << duration.count() << std::endl;
+    std::cout << "Query(micro seconds) : " << duration.count() << std::endl;
  }
   fin1.close(); 
 // here open a new file under ../data, to store measured time array
