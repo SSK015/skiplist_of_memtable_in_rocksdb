@@ -18,7 +18,12 @@
 #include "util/testharness.h"
 // #include "util/hash.h"
 #include "util/random.h"
-
+struct kv{
+   char key[101];
+   char val[501];
+} KV[1000001];
+int answer[10000001];
+// char val[1000001][501];
 namespace ROCKSDB_NAMESPACE {
 // read dataset op key value
 void loadData(std::string file){
@@ -217,10 +222,10 @@ std::set<std::string, std::less<>> keys;
    char key[101];
 //   char value[500];
    int qq = 0;
-   auto start_time = std::chrono::high_resolution_clock::now()      ;
-   char val[10001][101];
-	while(fin >> op >> key >> field){
-	++qq;
+//   auto start_time = std::chrono::high_resolution_clock::now()      ;
+//   char val[10001][101];
+	while(fin >> op >> KV[qq].key >> field){
+	//++qq;
    //   while(fin >> op >> key >> field){
         char value[501];
         fin.read(value, 1);
@@ -228,7 +233,7 @@ std::set<std::string, std::less<>> keys;
 //    strcpy(combine_kv, key);
 //	combine_kv = key;
 	char combine_kv[25]; 
-        fin.getline(value, 501, '\n');
+        fin.getline(KV[qq++].val, 501, '\n');
 	strcpy(combine_kv, key);
 	combine_kv[24] = '\0';
 //        strcpy(combine_kv + 24, value);	
@@ -237,13 +242,13 @@ std::set<std::string, std::less<>> keys;
 //        std::cout << key << " " << value << std::endl;
 //        std::cout << sizeof(combine_kv) << std::endl;i
 // 	std::cout << combine_kv << std::endl;
-        if (keys.insert(combine_kv).second) {
-		char* buf = list.AllocateKey(sizeof(combine_kv));
-    		memcpy(buf, combine_kv, sizeof(combine_kv));  // 将复制后的内容写入 buf
-    		buf[24] = '\0';  // 添加字符串结束符
-		
+//        if (keys.insert(KV[qq].key).second) {
+//		char* buf = list.AllocateKey(sizeof(KV[qq].key));
+//    		memcpy(buf, KV[qq].key, sizeof(KV[qq].key));  // 将复制后的内容写入 buf
+//    		buf[24] = '\0';  // 添加字符串结束符
+//		memcpy(KV[qq].key, buf, 24); 
  //  		std::cout << std::string(buf) << std::endl;
-    		list.Insert(buf, value);  // 将 buf 的地址传递给 Insert() 函数
+//    		list.Insert(buf, KV[qq++].val);  // 将 buf 的地址传递给 Insert() 函数
   //      char* buf = list.AllocateKey(sizeof(combine_kv));
 //		std::cout << sizeof(combine_kv) << std::endl;
 
@@ -252,14 +257,38 @@ std::set<std::string, std::less<>> keys;
 //		buff[24] = '\0';
 //		std::cout << buf << std::endl;	
 //	        list.Insert(buf);
-    		}
+//    		}
 }
     fin.close();
+    std::cout << qq << std::endl;
+  int qqq = 0;
+  auto start_time = std::chrono::high_resolution_clock::now()      ;
+  while (qqq < qq) {
+	if (keys.insert(KV[qqq].key).second) {
+                
+		char* buf = list.AllocateKey(sizeof(KV[qqq].key));
+                memcpy(buf, KV[qqq].key, sizeof(KV[qqq].key));  // 将复制后的内容写入 buf
+                buf[24] = '\0';  // 添加字符串结束符
+//	std::cout << KV[qqq].key << " " << KV[qqq].val << std::endl;
+//              memcpy(KV[qq].key, buf, 24); 
+ //             std::cout << std::string(buf) << std::endl;
+                list.Insert(buf, KV[qqq++].val);  // 将 buf 的地址传递给 Insert() 函数
+  //      char* buf = list.AllocateKey(sizeof(combine_kv));
+//              std::cout << sizeof(combine_kv) << std::endl;
+//auto start_time = std::chrono::high_resolution_clock::now()      ;
+//              memcpy(buff, combine_kv, sizeof(combine_kv));
+//            std::cout << buf << std::endl;
+//              buff[24] = '\0';
+//              std::cout << buf << std::endl;  
+//              list.Insert(buf);
+                }
+
+  }
   auto end_time = std::chrono::high_resolution_clock::now(); 
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
 
   std::cout << "Insert(micro seconds) : " << duration.count() / (double)qq << std::endl;
-
+	
   int count_data = 0;
 
   std::ifstream fin0("../data/query1M_100KKey.txt");
@@ -267,15 +296,15 @@ std::set<std::string, std::less<>> keys;
 	list.TEST_Validate();
   while (fin0 >> op) {
         char key0[VALUE_SIZE + 128];
-        fin0.read(key0, 1);	
+        fin0.read(key0, 1);
         fin0.getline(key0, VALUE_SIZE + 128, '\n');
 	count_data++;
 
-        if(!list.Contains(key0)) std::cout << "error"<<std::endl;
+//        if(!list.Contains(key0)) std::cout << "error" << std::endl;
   }
 // here compute total_time / count_data = throughoutput
   fin0.close();
-  std::cout << count_data <<std::endl;
+  std::cout << count_data << std::endl;
 
 //  std::cout << "aaaaa" << std::endl;
   std::ifstream fin1("../data/query1M_100KKey.txt");
@@ -290,7 +319,7 @@ std::set<std::string, std::less<>> keys;
 	fin1.read(key00, 1);
 	fin1.getline(key1, VALUE_SIZE + 128, '\n');
 //	std::cout << key1 << std::endl;
-    start_time = std::chrono::high_resolution_clock::now()      ;
+    start_time = std::chrono::high_resolution_clock::now();
  	InlineSkipList<TestComparator>::Iterator iter(&list);
   	
 	iter.Seek(key1);
@@ -303,15 +332,27 @@ std::set<std::string, std::less<>> keys;
 //    std::cout << iter.value() << std::endl;
   	end_time = std::chrono::high_resolution_clock::now();
   	duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    cnnt++;
-    std::cout << "Query(micro seconds) : " << duration.count() << std::endl;
+	answer[cnnt] = duration.count();
+       	cnnt++;
+    //std::cout << "Query(micro seconds) : " << duration.count() << std::endl;
  }
   fin1.close(); 
 // here open a new file under ../data, to store measured time array
 // use plt to draw a picture  
 // don not forget to close the file
   std::cout << cnnt << std::endl;
+  std::ofstream output("output.txt", std::ios::out);
+    if (!output) {
+        std::cout << "Failed to open output.txt" << std::endl;
+    }
+	for (int i = 1; i <= 1000001; ++i) {
+		output << answer[i] << " " << std::endl;
+	}
+    // 写入数组前100万个数据
+//    output.write(reinterpret_cast<const char*>(answer), sizeof(int) * 1000000);
 
+    // 关闭文件
+    output.close();
 //  for (Key i = 0; i < R; i++) {
 //    if (list.Contains(Encode(&i))) {
 //      ASSERT_EQ(keys.count(i), 1U);
