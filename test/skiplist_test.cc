@@ -341,12 +341,12 @@ std::set<std::string, std::less<>> keys;
 // use plt to draw a picture  
 // don not forget to close the file
   std::cout << cnnt << std::endl;
-  std::ofstream output("../output.txt", std::ios::out);
+  std::ofstream output("../data/output.txt", std::ios::out);
     if (!output) {
         std::cout << "Failed to open output.txt" << std::endl;
     }
 	for (int i = 1; i <= 1000001; ++i) {
-		output << answer[i] << " " << std::endl;
+		output << answer[i] << " ";
 	}
     // 写入数组前100万个数据
 //    output.write(reinterpret_cast<const char*>(answer), sizeof(int) * 1000000);
