@@ -66,7 +66,7 @@ class InlineSkipList {
  public:
   using DecodedKey =
       typename std::remove_reference<Comparator>::type::DecodedType;
-
+//!!MAXHeight
   static const uint16_t kMaxPossibleHeight = 32;
 
   // Create a new InlineSkipList object that will use "cmp" for comparing
@@ -75,7 +75,7 @@ class InlineSkipList {
   // skiplist object.
   explicit InlineSkipList(Comparator cmp, Allocator* allocator,
                           int32_t max_height = 12,
-                          int32_t branching_factor = 4);
+                          int32_t branching_factor = 4);//12, p = 4
   // No copying allowed
   InlineSkipList(const InlineSkipList&) = delete;
   InlineSkipList& operator=(const InlineSkipList&) = delete;
