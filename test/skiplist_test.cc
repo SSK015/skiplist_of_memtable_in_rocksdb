@@ -1,6 +1,9 @@
 //  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
 //
 //  This file is a little different with original one in rocksdb As we use YCSB-generated data to test.
+
+//tester-rdma
+//
 #define VALUE_SIZE 648
 #include "port/port.h"
 #include <gtest/gtest.h>
