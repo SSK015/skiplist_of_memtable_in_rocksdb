@@ -3,8 +3,12 @@ A baseline code implementation based on  skiplist of memtable in database rocksd
 
 ## need rocksdb lib
 
-Thanks to Mr. chatgpt for his help with the code review!
+<!-->Thanks to Mr. chatgpt for his help with the code review!
 
 ./run.sh
 
 ./skiplist_of_memtable_in_rocksdb
+<!-->
+RDMA-version of skiplist.
+
+Constructing.
