@@ -21,13 +21,19 @@
 #include "util/testharness.h"
 // #include "util/hash.h"
 #include "util/random.h"
-struct kv{
-   char key[101];
-   char val[501];
-} KV[1000001];
-int answer[10000001];
+  struct kv{
+   char key[30];
+   char val[70];
+} KV[100001];
+int answer[1000001];
+char** ptr[1000001];
+void* vptr[1000001];
+char tmp_key[1000001][101];
+char* vv[100001];
+char** vvv[100001];
 // char val[1000001][501];
 namespace ROCKSDB_NAMESPACE {
+
 // read dataset op key value
 void loadData(std::string file){
     std::ifstream fin(file);
@@ -113,14 +119,14 @@ using TestInlineSkipList = InlineSkipList<TestComparator>;
 
 class InlineSkipTest : public testing::Test {
  public:
-  void Insert(TestInlineSkipList* list, Key key, Key value) {
+  void Insert(TestInlineSkipList* list, Key key, Key* value) {
     char* buf = list->AllocateKey(sizeof(Key));
     memcpy(buf, &key, sizeof(Key));
     list->Insert(buf, value);
     keys_.insert(key);
   }
 
-  bool InsertWithHint(TestInlineSkipList* list, Key key, Key value, void** hint) {
+  bool InsertWithHint(TestInlineSkipList* list, Key key, Key* value, void** hint) {
     char* buf = list->AllocateKey(sizeof(Key));
     memcpy(buf, &key, sizeof(Key));
     bool res = list->InsertWithHint(buf, value, hint);
@@ -227,18 +233,21 @@ std::set<std::string, std::less<>> keys;
    int qq = 0;
 //   auto start_time = std::chrono::high_resolution_clock::now()      ;
 //   char val[10001][101];
+  char value[12];
 	while(fin >> op >> KV[qq].key >> field){
 	//++qq;
    //   while(fin >> op >> key >> field){
-        char value[501];
+        
         fin.read(value, 1);
+        // std::cout << value << std::endl;
 //	auto neww = new conbine_kv;
 //    strcpy(combine_kv, key);
 //	combine_kv = key;
-	char combine_kv[25]; 
-        fin.getline(KV[qq++].val, 501, '\n');
-	strcpy(combine_kv, key);
-	combine_kv[24] = '\0';
+	// char combine_kv[25]; 
+        fin.getline(KV[qq++].val, 70, '\n');
+  // KV[qq - 1].val[64] = '\0';
+	// strcpy(combine_kv, key);
+	// combine_kv[24] = '\0';
 //        strcpy(combine_kv + 24, value);	
 //	strcpy(combine_kv + 501, key);
 //        combine_kv + 25 = value;
@@ -265,18 +274,49 @@ std::set<std::string, std::less<>> keys;
     fin.close();
     std::cout << qq << std::endl;
   int qqq = 0;
-  auto start_time = std::chrono::high_resolution_clock::now()      ;
+  auto start_time = std::chrono::high_resolution_clock::now();
   while (qqq < qq) {
+    // std::cout << 1 << std::endl;
 	if (keys.insert(KV[qqq].key).second) {
-                
+      // std::cout << 1 << std::endl;          
 		char* buf = list.AllocateKey(sizeof(KV[qqq].key));
+                // std::cout << 1 << std::endl;
                 memcpy(buf, KV[qqq].key, sizeof(KV[qqq].key));  // 将复制后的内容写入 buf
                 buf[24] = '\0';  // 添加字符串结束符
 //	std::cout << KV[qqq].key << " " << KV[qqq].val << std::endl;
 //              memcpy(KV[qq].key, buf, 24); 
- //             std::cout << std::string(buf) << std::endl;
-                list.Insert(buf, KV[qqq++].val);  // 将 buf 的地址传递给 Insert() 函数
-  //      char* buf = list.AllocateKey(sizeof(combine_kv));
+//             std::cout << std::string(buf) << std::endl;
+                // KV[qqq].val = &KV[qqq].val;
+                // auto vv = KV[qqq++].val;
+                // char* vv = &(KV[qqq++].val);
+                // std::cout << qqq << std::endl;
+                // std::cout << vv[qqq] << std::endl;
+                char (*ptr)[70] = &KV[qqq].val; // 声明一个指向字符数组的指针
+                vv[qqq] = *ptr; // 将字符数组的地址赋值给指针数组
+
+                // vv[qqq] = &KV[qqq].val;
+                // std::cout << KV[qqq].val << std::endl;
+                // qqq++;
+                // std::cout << qqq << std::endl;
+                // vvv[qqq] = static_cast<void*>(vv[qqq]);
+                // if (qqq == )
+                // char* taichale = static_cast<char*>();
+                // qqq++;
+                // if (qqq == 40900) {
+                // std::cout << KV[qqq - 1].key << std::endl;
+                // std::cout << &vv[qqq] << std::endl;
+                // vvv[qq] = &vv[qqq];
+                // break;s
+                // } 
+                // if (qqq == 40901) {
+                // std::cout << KV[qqq - 1].key << std::endl;
+                // std::cout << &vv[qqq] << std::endl;
+                // break;
+                // } 
+                
+                // std::cout << static_cast<void*>(vv) << std::endl;
+                list.Insert(buf, &vv[qqq++]);  // 将 buf 的地址传递给 Insert() 函数
+//      char* buf = list.AllocateKey(sizeof(combine_kv));
 //              std::cout << sizeof(combine_kv) << std::endl;
 //auto start_time = std::chrono::high_resolution_clock::now()      ;
 //              memcpy(buff, combine_kv, sizeof(combine_kv));
@@ -284,6 +324,8 @@ std::set<std::string, std::less<>> keys;
 //              buff[24] = '\0';
 //              std::cout << buf << std::endl;  
 //              list.Insert(buf);
+                } else {
+                  std::cout << "error" << std::endl;
                 }
 
   }
@@ -298,12 +340,12 @@ std::set<std::string, std::less<>> keys;
 //  InlineSkipList<TestComparator>::Iterator iter0(&list);
 	list.TEST_Validate();
   while (fin0 >> op) {
-        char key0[VALUE_SIZE + 128];
+        char key0[30];
         fin0.read(key0, 1);
-        fin0.getline(key0, VALUE_SIZE + 128, '\n');
+        fin0.getline(key0, 30, '\n');
 	count_data++;
 
-//        if(!list.Contains(key0)) std::cout << "error" << std::endl;
+       if(!list.Contains(key0)) std::cout << "error" << std::endl;
   }
 // here compute total_time / count_data = throughoutput
   fin0.close();
@@ -315,12 +357,16 @@ std::set<std::string, std::less<>> keys;
 //  start_time = std::chrono::high_resolution_clock::now(); 
   int cnnt = 0;
   char key00[20];
+  char key1[30];
+  char** ans = (char **) malloc(sizeof(char**));
+  char* str;
   while (fin1 >> op) {
 // initialize a timer here to count every query opreation time
-	char key1[VALUE_SIZE + 128];
+	
 //	std::cout << "sss" << std::endl;
 	fin1.read(key00, 1);
-	fin1.getline(key1, VALUE_SIZE + 128, '\n');
+	fin1.getline(key1, 30, '\n');
+  strcpy(tmp_key[cnnt + 1], key1);
 //	std::cout << key1 << std::endl;
     start_time = std::chrono::high_resolution_clock::now();
  	InlineSkipList<TestComparator>::Iterator iter(&list);
@@ -332,14 +378,68 @@ std::set<std::string, std::less<>> keys;
 //        iter.RandomSeek();
 	// timer end, and flush this time to an array;
 	ASSERT_TRUE(iter.Valid());
-//    std::cout << iter.value() << std::endl;
-  	end_time = std::chrono::high_resolution_clock::now();
-  	duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+  ans = iter.value();
+  // std::cout << ans << std::endl;
+  // vptr[cnnt + 1] = *ans;
+  //  char* str = <char*>(ans);
+  // str = static_cast<char*>(ans);
+  std::cout << cnnt + 1 << std::endl;
+
+   std::cout << ans << std::endl;
+   std::cout << tmp_key[cnnt + 1] << std::endl;
+   std::cout << *ans << std::endl;
+  //  void* ano = reinterpret_cast<void*>(0x561c868d1dd8);
+  //  char* strr = static_cast<char*>(ano);
+  ptr[cnnt + 1] = ans;
+  // strcpy(ptr[cnnt + 1], str);
+
+  //  std::cout << strr <<std::endl;
+// if (cnnt == 131643) {
+  // std::cout << str << std::endl;
+  //  break;
+  // }
+  // if (
+    // printf("%s\n", str);
+    // auto ans_n = const_cast<const char*>(reinterpret_cast<const char*>(ans));
+  //  std::cout << *(ans_n) << std::endl;
+  end_time = std::chrono::high_resolution_clock::now();
+  duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
 	answer[cnnt] = duration.count();
        	cnnt++;
     //std::cout << "Query(micro seconds) : " << duration.count() << std::endl;
  }
+//  std::cout << 1 << std::endl;
+//  if(ans != NULL)
+    // {
+        // free(ans);
+        // ans=NULL;
+    // }
+    // if(str != NULL)
+    // {
+        // free(str);
+        // str=NULL;
+    // }
   fin1.close(); 
+  std::cout << 1 << std::endl;
+  // for (int i = 1; i <= 1000000; ++i) {
+    // if (i == 131648) {
+    // std::cout << i << std::endl;
+    // printf("%s\n", tmp_key[i]);
+    // printf("%x\n", ptr[i]);
+    // std::cout << ptr[i] << std::endl;
+    // std::cout << *ptr[i] << std::endl;
+    // }
+    // if (i == 182784) {
+    // std::cout << i << std::endl;
+    // printf("%s\n", tmp_key[i]);
+    // printf("%x\n", ptr[i]);
+    // std::cout << *ptr[i] << std::endl;
+    // char* aa = static_cast<char*>(vptr[i]);
+    
+    // }
+    // char* aa = static_cast<char*>(vptr[i]);
+    // std::cout << aa << std::endl;
+  // }
 // here open a new file under ../data, to store measured time array
 // use plt to draw a picture  
 // don not forget to close the file

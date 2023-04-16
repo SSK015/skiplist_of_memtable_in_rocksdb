@@ -96,7 +96,7 @@ class InlineSkipList {
   //
   // REQUIRES: nothing that compares equal to key is currently in the list.
   // REQUIRES: no concurrent calls to any of inserts.
-  bool Insert(const char* key, char* value);
+  bool Insert(const char* key, char** value);
 
   // Inserts a key allocated by AllocateKey with a hint of last insert
   // position in the skip-list. If hint points to nullptr, a new hint will be
@@ -108,16 +108,16 @@ class InlineSkipList {
   //
   // REQUIRES: nothing that compares equal to key is currently in the list.
   // REQUIRES: no concurrent calls to any of inserts.
-  bool InsertWithHint(const char* key, char* value, void** hint);
+  bool InsertWithHint(const char* key, char** value, void** hint);
 
   // Like InsertConcurrently, but with a hint
   //
   // REQUIRES: nothing that compares equal to key is currently in the list.
   // REQUIRES: no concurrent calls that use same hint
-  bool InsertWithHintConcurrently(const char* key, char* value, void** hint);
+  bool InsertWithHintConcurrently(const char* key, char** value, void** hint);
 
   // Like Insert, but external synchronization is not required.
-  bool InsertConcurrently(const char* key, char* value);
+  bool InsertConcurrently(const char* key, char** value);
 
   // Inserts a node into the skip list.  key must have been allocated by
   // AllocateKey and then filled in by the caller.  If UseCAS is true,
@@ -135,7 +135,7 @@ class InlineSkipList {
   // false has worse running time for the non-sequential case O(log N),
   // but a better constant factor.
   template <bool UseCAS>
-  bool Insert(const char* key, char* value, Splice* splice, bool allow_partial_splice_fix);
+  bool Insert(const char* key, char** value, Splice* splice, bool allow_partial_splice_fix);
 
   // Returns true iff an entry that compares equal to key is in the list.
   bool Contains(const char* key) const;
@@ -165,7 +165,7 @@ class InlineSkipList {
     // REQUIRES: Valid()
     const char* key() const;
 
-    const char* value() const;
+    char** value();
 
     void update(char* valuee) const;
     // Advances to the next position.
@@ -197,6 +197,7 @@ class InlineSkipList {
     const InlineSkipList* list_;
     Node* node_;
     // Intentionally copyable
+
   };
 
  private:
@@ -304,6 +305,15 @@ template <class Comparator>
 struct InlineSkipList<Comparator>::Node {
   // Stores the height of the node in the memory location normally used for
   // next_[0].  This is used for passing data from AllocateKey to Insert.
+  Node() {
+    value = new char*(); 
+    gongjuren = new char*(); 
+  }
+
+  ~Node() {
+    delete value;
+    delete gongjuren;
+  }
   void StashHeight(const int height) {
     assert(sizeof(int) <= sizeof(next_[0]));
     memcpy(static_cast<void*>(&next_[0]), &height, sizeof(int));
@@ -330,14 +340,14 @@ struct InlineSkipList<Comparator>::Node {
 //	memcpy(value, const_cast<void*>(static_cast<const void*>(static_cast<const char*>(valuee))), strlen((const char*)valuee) + 1)
 //	  memcpy(value, const_cast<void*>(static_cast<const void*>(static_cast<const char*>(valuee))), strlen((const char*)valuee) + 1);
   }
-  const char* Value() const {
-	return value;
+  // const char** Value() const {
+	// return value;
 	  //	auto ret = &value;
 //	char value[501];
 //	memcpy(value_get, ret + 24, 501);
 //	return value_get;
 //        return reinterpret_cast<const char*>(ret);
-  }
+  // }
   // Accessors/mutators for links.  Wrapped in methods so we can add
   // the appropriate barriers as necessary, and perform the necessary
   // addressing trickery for storing links below the Node in memory.
@@ -363,12 +373,15 @@ struct InlineSkipList<Comparator>::Node {
   // No-barrier variants that can be safely used in a few locations.
   Node* NoBarrier_Next(int n) {
     assert(n >= 0);
-    return (&next_[0] - n)->load(std::memory_order_relaxed);
+    return (&next_[0] - n)->load(std::memory_order_release);
   }
 
   void NoBarrier_SetNext(int n, Node* x) {
     assert(n >= 0);
-    (&next_[0] - n)->store(x, std::memory_order_relaxed);
+
+    (&next_[0] - n)->store(x, std::memory_order_release);
+    // value = 
+    // std::atomic_thread_fence(std::memory_order_release);
   }
 
   // Insert node after prev on specific level.
@@ -378,12 +391,17 @@ struct InlineSkipList<Comparator>::Node {
     NoBarrier_SetNext(level, prev->NoBarrier_Next(level));
     prev->SetNext(level, this);
   }
- char value[501];
+  char** value;
+  char gongjuren[201];
  private:
   // next_[0] is the lowest level link (level 0).  Higher levels are
   // stored _earlier_, so level 1 is at next_[-1].
   std::atomic<Node*> next_[1];
 //  char value[501];
+//  public:
+//  char** value;
+//  char** value;
+  // char** gongjuren;
 };
 
 template <class Comparator>
@@ -411,7 +429,7 @@ inline const char* InlineSkipList<Comparator>::Iterator::key() const {
 }
 
 template <class Comparator>
-inline const char* InlineSkipList<Comparator>::Iterator::value() const {
+inline char** InlineSkipList<Comparator>::Iterator::value() {
   assert(Valid());
   return node_->value;
 }
@@ -518,6 +536,7 @@ InlineSkipList<Comparator>::FindGreaterOrEqual(const char* key) const {
   // A concurrent insert might occur after FindLessThan(key) but before
   // we get a chance to call Next(0).
   Node* x = head_;
+
   int level = GetMaxHeight() - 1;
   Node* last_bigger = nullptr;
   const DecodedKey key_decoded = compare_.decode_key(key);
@@ -758,12 +777,12 @@ InlineSkipList<Comparator>::AllocateSpliceOnHeap() {
 }
 
 template <class Comparator>
-bool InlineSkipList<Comparator>::Insert(const char* key, char* value) {
+bool InlineSkipList<Comparator>::Insert(const char* key, char** value) {
   return Insert<false>(key, value, seq_splice_, false);
 }
 
 template <class Comparator>
-bool InlineSkipList<Comparator>::InsertConcurrently(const char* key, char* value) {
+bool InlineSkipList<Comparator>::InsertConcurrently(const char* key, char** value) {
   Node* prev[kMaxPossibleHeight];
   Node* next[kMaxPossibleHeight];
   Splice splice;
@@ -773,7 +792,7 @@ bool InlineSkipList<Comparator>::InsertConcurrently(const char* key, char* value
 }
 
 template <class Comparator>
-bool InlineSkipList<Comparator>::InsertWithHint(const char* key, char* value, void** hint) {
+bool InlineSkipList<Comparator>::InsertWithHint(const char* key, char** value, void** hint) {
   assert(hint != nullptr);
   Splice* splice = reinterpret_cast<Splice*>(*hint);
   if (splice == nullptr) {
@@ -784,7 +803,7 @@ bool InlineSkipList<Comparator>::InsertWithHint(const char* key, char* value, vo
 }
 
 template <class Comparator>
-bool InlineSkipList<Comparator>::InsertWithHintConcurrently(const char* key, char* value,
+bool InlineSkipList<Comparator>::InsertWithHintConcurrently(const char* key, char** value,
                                                             void** hint) {
   assert(hint != nullptr);
   Splice* splice = reinterpret_cast<Splice*>(*hint);
@@ -838,17 +857,37 @@ void InlineSkipList<Comparator>::RecomputeSpliceLevels(const DecodedKey& key,
 
 template <class Comparator>
 template <bool UseCAS>
-bool InlineSkipList<Comparator>::Insert(const char* keyy, char* value, Splice* splice, bool allow_partial_splice_fix) {
+bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* splice, bool allow_partial_splice_fix) {
 //    std::cout << keyy << std::endl;
 //    char key[25];
 //    memcpy(key, keyy, 24);
 //    key[24] = '\0';
-//  std::cout << keyy << std::endl;
+//  std::cout << value << std::endl;
+  // std::cout << value << std::endl;
+  // x->value = *value;
+  // std::cout << value << std::endl;
   Node* x = reinterpret_cast<Node*>((const_cast<char*>(keyy))) - 1;
 //  x->Update(value);i
 //  std::cout << sizeof(value) << std::endl;
- 
-  memcpy(x->value, value, 64);
+  // std::cout << x->value << std::endl;
+  // memcpy(x->value, value, 8);
+  // x->value = new char*; // 分配一个指向 char* 类型的指针
+  // *(x->value) = new char[10];
+  // x->value = new char*; // 分配一个指向 char* 类型的指针
+  // *(x->value) = new char[strlen(*value) + 1]; // 分配一个 char* 类型的指针指向的字符串的内存空间
+  // strcpy(*(x->value), *value); // 把 value 的值复制到 *(x->value) 指向的字符串内存空间中
+  // std::cout << value << std::endl;
+  // std::cout << x->value << std::endl;
+  //  if (x->value == NULL) std::cout << 1 << std::endl; 
+  x->value = value;
+  std::cout << x->value << std::endl;
+  // x->value = value;
+  // std::cout << x->value << std::endl;
+  // std::cout << x->value << std::endl;
+  // if (x->value == NULL) std::cout << "error" <<std::endl;
+    // strdup(x->value);
+  // std::cout << std::endl;
+  
   const DecodedKey key_decoded = compare_.decode_key(keyy);
 //  key_decoded[24] = '\0';
 	
@@ -856,7 +895,7 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char* value, Splice* s
 //  Node* x = reinterpret_cast<Node*>((const_cast<char*>(keyy))) - 1; 
   //const DecodedKey key_decoded = compare_.decode_key(keyy);
   int height = x->UnstashHeight();
-//  std::cout << height << std::endl;
+ std::cout << height << std::endl;
   assert(height >= 1 && height <= kMaxHeight_);
   //std::cout << x->Key() <<std::endl;
   int max_height = max_height_.load(std::memory_order_relaxed);
@@ -956,9 +995,11 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char* value, Splice* s
   if (recompute_height > 0) {
     RecomputeSpliceLevels(key_decoded, splice, recompute_height);
   }
-
+  // x->value = value;
+  std::cout << x->value << std::endl;
   bool splice_is_valid = true;
   if (UseCAS) {
+    // std::cout << x->value << std::endl;
     for (int i = 0; i < height; ++i) {
       while (true) {
         // Checking for duplicate keys on the level 0 is sufficient
@@ -1016,15 +1057,36 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char* value, Splice* s
         // duplicate key
         return false;
       }
+     
+      // std::cout << x->value << std::endl;
       assert(splice->next_[i] == nullptr ||
              compare_(x->Key(), splice->next_[i]->Key()) < 0);
       assert(splice->prev_[i] == head_ ||
              compare_(splice->prev_[i]->Key(), x->Key()) < 0);
       assert(splice->prev_[i]->Next(i) == splice->next_[i]);
+      // std::cout << x->value << std::endl;
+      //  if (x->value != value) {
+        // std::cout << "000" << std::endl;
+        // std::cout << "error!" << std::endl;
+        // x->value = value;
+      // }
       x->NoBarrier_SetNext(i, splice->next_[i]);
+      // std::cout << x->value << std::endl;
+      //  if (x->value != value) {
+        // std::cout << "000" << std::endl;
+        // std::cout << "error!" << std::endl;
+        // x->value = value;
+      // }
       splice->prev_[i]->SetNext(i, x);
+      // std::cout << x->value << std::endl;
+       if (x->value != value) {
+        std::cout << i << std::endl;
+        std::cout << "error!" << std::endl;
+        // x->value = value;
+      }
     }
   }
+  // std::cout << x->value << std::endl;
   if (splice_is_valid) {
     for (int i = 0; i < height; ++i) {
       splice->prev_[i] = x;
@@ -1048,6 +1110,8 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char* value, Splice* s
   } else {
     splice->height_ = 0;
   }
+  // x->value = value;
+  // std::cout << x->value << std::endl;
   return true;
 }
 
