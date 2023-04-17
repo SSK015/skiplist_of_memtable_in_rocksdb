@@ -1,0 +1,136 @@
+[15:10:38.438] Log Level: 2
+[15:10:38.439] remote-ssh@0.90.1
+[15:10:38.440] linux x64
+[15:10:38.449] SSH Resolver called for "ssh-remote+hust02", attempt 1
+[15:10:38.450] "remote.SSH.useLocalServer": true
+[15:10:38.452] "remote.SSH.path": undefined
+[15:10:38.453] "remote.SSH.configFile": undefined
+[15:10:38.453] "remote.SSH.useFlock": true
+[15:10:38.453] "remote.SSH.lockfilesInTmp": false
+[15:10:38.454] "remote.SSH.localServerDownload": auto
+[15:10:38.454] "remote.SSH.remoteServerListenOnSocket": false
+[15:10:38.455] "remote.SSH.showLoginTerminal": false
+[15:10:38.455] "remote.SSH.defaultExtensions": []
+[15:10:38.455] "remote.SSH.loglevel": 2
+[15:10:38.455] "remote.SSH.enableDynamicForwarding": true
+[15:10:38.456] "remote.SSH.enableRemoteCommand": false
+[15:10:38.456] "remote.SSH.serverPickPortsFromRange": {}
+[15:10:38.456] "remote.SSH.serverInstallPath": {}
+[15:10:38.482] SSH Resolver called for host: hust02
+[15:10:38.483] Setting up SSH remote "hust02"
+[15:10:38.488] Acquiring local install lock: /tmp/vscode-remote-ssh-d8136d83-install.lock
+[15:10:38.490] Looking for existing server data file at /home/xyw/Documents/Code/rocksdb/rdma/skiplist_of_memtable_in_rocksdb/.vscode-root/User/globalStorage/ms-vscode-remote.remote-ssh/vscode-ssh-host-d8136d83-784b0177c56c607789f9638da7b6bf3230d47a8c-0.90.1/data.json
+[15:10:38.491] Using commit id "784b0177c56c607789f9638da7b6bf3230d47a8c" and quality "stable" for server
+[15:10:38.496] Install and start server if needed
+[15:10:38.501] PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+[15:10:38.501] Checking ssh with "ssh -V"
+[15:10:38.515] > OpenSSH_8.2p1 Ubuntu-4ubuntu0.5, OpenSSL 1.1.1f  31 Mar 2020
+
+[15:10:38.530] askpass server listening on /tmp/vscode-ssh-askpass-908a90101317d7cccdd4351c0da23bde3de154bf.sock
+[15:10:38.530] Spawning local server with {"serverId":1,"ipcHandlePath":"/tmp/vscode-ssh-askpass-0edafe674ab92c19905fdbca73018035157c108e.sock","sshCommand":"ssh","sshArgs":["-v","-T","-D","46753","-o","ConnectTimeout=15","hust02"],"serverDataFolderName":".vscode-server","dataFilePath":"/home/xyw/Documents/Code/rocksdb/rdma/skiplist_of_memtable_in_rocksdb/.vscode-root/User/globalStorage/ms-vscode-remote.remote-ssh/vscode-ssh-host-d8136d83-784b0177c56c607789f9638da7b6bf3230d47a8c-0.90.1/data.json"}
+[15:10:38.531] Local server env: {"SHELL":"/bin/bash","DISPLAY":":0","ELECTRON_RUN_AS_NODE":"1","SSH_ASKPASS":"/root/.vscode/extensions/ms-vscode-remote.remote-ssh-0.90.1/out/local-server/askpass.sh","VSCODE_SSH_ASKPASS_NODE":"/usr/share/code/code","VSCODE_SSH_ASKPASS_EXTRA_ARGS":"--ms-enable-electron-run-as-node","VSCODE_SSH_ASKPASS_MAIN":"/root/.vscode/extensions/ms-vscode-remote.remote-ssh-0.90.1/out/askpass-main.js","VSCODE_SSH_ASKPASS_HANDLE":"/tmp/vscode-ssh-askpass-908a90101317d7cccdd4351c0da23bde3de154bf.sock"}
+[15:10:38.540] Spawned 58410
+[15:10:38.758] > local-server-1> Spawned ssh, pid=58418
+[15:10:38.776] stderr> OpenSSH_8.2p1 Ubuntu-4ubuntu0.5, OpenSSL 1.1.1f  31 Mar 2020
+[15:10:39.139] stderr> debug1: Server host key: ecdsa-sha2-nistp256 SHA256:RTYGHnJ48YY8z0RysizPpTP0ShpOGWw9u4R5abt086k
+[15:10:39.376] stderr> Authenticated to xz-ct1.cloudiplc.com ([221.229.197.212]:39234).
+[15:10:40.410] > Welcome to Ubuntu 20.04.4 LTS (GNU/Linux 5.4.0-136-generic x86_64)
+> 
+>  * Documentation:  https://help.ubuntu.com
+>  * Management:     https://landscape.canonical.com
+>  * Support:        https://ubuntu.com/advantage
+> 
+>   System information as of Sun 16 Apr 2023 03:10:39 PM CST
+> 
+>   System load:  0.06                Processes:                   1513
+>   Usage of /:   47.3% of 889.17GB   Users logged in:             2
+>   Memory usage: 4%                  IPv4 address for ens25f0:    172.16.9.234
+>   Swap usage:   0%                  IPv4 address for ztc25kybwp: 10.144.184.215
+>   Temperature:  42.0 C              IPv4 address for ztc25kybwp: 10.144.39.234
+> 
+>  * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+>    just raised the bar for easy, resilient and secure K8s cluster deployment.
+> 
+>    https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+> 
+> 173 updates can be applied immediately.
+> To see these additional updates run: apt list --upgradable
+> 
+> 
+> 1 updates could not be installed automatically. For more details,
+> see /var/log/unattended-upgrades/unattended-upgrades.log
+> Your Hardware Enablement Stack (HWE) is supported until April 2025.
+> 
+> *** System restart required ***
+[15:10:40.470] > ready: ebddc50af655
+[15:10:40.514] > Linux 5.4.0-136-generic #153-Ubuntu SMP Thu Nov 24 15:56:58 UTC 2022
+[15:10:40.515] Platform: linux
+[15:10:40.556] > /bin/bash
+[15:10:40.557] Shell: bash
+[15:10:40.557] Creating bash subshell inside "bash"
+[15:10:40.663] > bash version:  5.0.17(1)-release
+[15:10:40.704] > bash version:  5.0.17(1)-release
+[15:10:40.763] > bash version:  5.0.17(1)-release
+[15:10:40.827] > ebddc50af655: running
+> Acquiring lock on /home/xyw/.vscode-server/bin/784b0177c56c607789f9638da7b6bf3230d47a8c/vscode-remote-lock.xyw.784b0177c56c607789f9638da7b6bf3230d47a8c
+> Found existing installation at /home/xyw/.vscode-server/bin/784b0177c56c607789f9638da7b6bf3230d47a8c...
+> Checking /home/xyw/.vscode-server/.784b0177c56c607789f9638da7b6bf3230d47a8c.log and /home/xyw/.vscode-server/.784b0177c56c607789f9638da7b6bf3230d47a8c.pid for a running server
+> Looking for server with pid: 2607957
+[15:10:40.887] > Found running server...
+>  
+> *
+> * Reminder: You may only use this software with Visual Studio family products,
+> * as described in the license (https://go.microsoft.com/fwlink/?linkid=2077057)
+> *
+>  
+> Checking server status on port 42491 with wget
+[15:10:40.960] > ebddc50af655: start
+> SSH_AUTH_SOCK====
+> DISPLAY====
+> webUiAccessToken====
+> listeningOn==42491==
+> osReleaseId==ubuntu==
+> arch==x86_64==
+> tmpDir==/run/user/1001==
+> platform==linux==
+> unpackResult====
+> didLocalDownload==0==
+> downloadTime====
+> installTime====
+> extInstallTime====
+> serverStartTime====
+> connectionToken==11aa11aa-111a-1a1a-1aaa-aa1aa1a11aa1==
+> ebddc50af655: end
+[15:10:40.960] Received install output: 
+SSH_AUTH_SOCK====
+DISPLAY====
+webUiAccessToken====
+listeningOn==42491==
+osReleaseId==ubuntu==
+arch==x86_64==
+tmpDir==/run/user/1001==
+platform==linux==
+unpackResult====
+didLocalDownload==0==
+downloadTime====
+installTime====
+extInstallTime====
+serverStartTime====
+connectionToken==11aa11aa-111a-1a1a-1aaa-aa1aa1a11aa1==
+
+[15:10:40.961] Remote server is listening on 42491
+[15:10:40.961] Parsed server configuration: {"serverConfiguration":{"remoteListeningOn":{"port":42491},"osReleaseId":"ubuntu","arch":"x86_64","webUiAccessToken":"","sshAuthSock":"","display":"","tmpDir":"/run/user/1001","platform":"linux","connectionToken":"11aa11aa-111a-1a1a-1aaa-aa1aa1a11aa1"},"installUnpackCode":""}
+[15:10:40.965] Persisting server connection details to /home/xyw/Documents/Code/rocksdb/rdma/skiplist_of_memtable_in_rocksdb/.vscode-root/User/globalStorage/ms-vscode-remote.remote-ssh/vscode-ssh-host-d8136d83-784b0177c56c607789f9638da7b6bf3230d47a8c-0.90.1/data.json
+[15:10:40.973] Starting forwarding server. localPort 38055 -> socksPort 46753 -> remotePort 42491
+[15:10:40.973] Forwarding server listening on 38055
+[15:10:40.973] Waiting for ssh tunnel to be ready
+[15:10:40.975] [Forwarding server 38055] Got connection 0
+[15:10:40.978] Tunneled 42491 to local port 38055
+[15:10:40.978] Resolved "ssh-remote+hust02" to "127.0.0.1:38055"
+[15:10:40.998] ------
+
+
+
+
+[15:10:41.190] [Forwarding server 38055] Got connection 1
+[15:10:41.298] [Forwarding server 38055] Got connection 2

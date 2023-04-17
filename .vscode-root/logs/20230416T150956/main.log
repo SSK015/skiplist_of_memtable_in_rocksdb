@@ -1,0 +1,25 @@
+[2023-04-16 15:09:56.117] [main] [error] [uncaught exception in main]: Error: Unable to retrieve mac address (unexpected format)
+[2023-04-16 15:09:56.117] [main] [error] Error: Unable to retrieve mac address (unexpected format)
+    at R (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:16:47813)
+    at m (/usr/share/code/resources/app/out/vs/code/electron-main/main.js:21:38958)
+    at process.processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async /usr/share/code/resources/app/out/vs/code/electron-main/main.js:21:38816
+[2023-04-16 15:09:57.288] [main] [info] update#setState idle
+[2023-04-16 15:10:00.263] [main] [info] Starting extension host with pid 58148 (fork() took 15 ms).
+[2023-04-16 15:10:10.050] [main] [info] Starting extension host with pid 58213 (fork() took 13 ms).
+[2023-04-16 15:10:27.290] [main] [info] update#setState checking for updates
+[2023-04-16 15:10:27.297] [main] [error] Error: net::ERR_INTERNET_DISCONNECTED
+    at SimpleURLLoaderWrapper.<anonymous> (node:electron/js2c/browser_init:105:7047)
+    at SimpleURLLoaderWrapper.emit (node:events:526:28)
+[2023-04-16 15:10:27.297] [main] [info] update#setState idle
+[2023-04-16 15:10:36.050] [main] [info] Extension host with pid 58213 exited with code: 0, signal: null.
+[2023-04-16 15:10:37.755] [main] [info] Starting extension host with pid 58384 (fork() took 12 ms).
+[2023-04-16 15:11:01.576] [main] [info] Extension host with pid 58384 exited with code: 0, signal: null.
+[2023-04-16 15:11:03.297] [main] [info] Starting extension host with pid 58428 (fork() took 11 ms).
+[2023-04-16 19:51:30.900] [main] [info] Extension host with pid 58428 exited with code: 0, signal: null.
+[2023-04-16 19:51:32.769] [main] [info] Starting extension host with pid 59544 (fork() took 39 ms).
+[2023-04-16 19:52:18.447] [main] [info] Extension host with pid 59544 exited with code: 0, signal: null.
+[2023-04-16 19:52:28.709] [main] [info] Starting extension host with pid 59675 (fork() took 24 ms).
+[2023-04-16 19:52:44.190] [main] [info] Extension host with pid 59675 exited with code: 0, signal: null.
+[2023-04-16 19:52:44.343] [main] [info] Waiting for extension host with pid 58148 to exit.
+[2023-04-16 19:52:44.400] [main] [info] Extension host with pid 58148 exited with code: 0, signal: null.

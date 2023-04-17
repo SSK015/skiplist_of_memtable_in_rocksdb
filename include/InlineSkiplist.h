@@ -283,6 +283,19 @@ class InlineSkipList {
 // Implementation details follow
 //char key_get[24];
 //char value_get[501];
+// template <class Comparator>
+/*struct Ptr {
+  // The invariant of a Splice is that prev_[i+1].key <= prev_[i].key <
+  // next_[i].key <= next_[i+1].key for all i.  That means that if a
+  // key is bracketed by prev_[i] and next_[i] then it is bracketed by
+  // all higher levels.  It is _not_ required that prev_[i]->Next(i) ==
+  // next_[i] (it probably did at some point in the past, but intervening
+  // or concurrent operations might have inserted nodes in between).
+  int length_;
+  // Node** prev_;
+  // Node** next_;
+  Node* node_ptr_;
+};*/
 template <class Comparator>
 struct InlineSkipList<Comparator>::Splice {
   // The invariant of a Splice is that prev_[i+1].key <= prev_[i].key <
@@ -305,15 +318,15 @@ template <class Comparator>
 struct InlineSkipList<Comparator>::Node {
   // Stores the height of the node in the memory location normally used for
   // next_[0].  This is used for passing data from AllocateKey to Insert.
-  Node() {
-    value = new char*(); 
-    gongjuren = new char*(); 
-  }
+  // Node() {
+    // value = new char*(); 
+    // gongjuren = new char*(); 
+  // }
 
-  ~Node() {
-    delete value;
-    delete gongjuren;
-  }
+  // ~Node() {
+    // delete value;
+    // delete gongjuren;
+  // }
   void StashHeight(const int height) {
     assert(sizeof(int) <= sizeof(next_[0]));
     memcpy(static_cast<void*>(&next_[0]), &height, sizeof(int));
@@ -392,6 +405,7 @@ struct InlineSkipList<Comparator>::Node {
     prev->SetNext(level, this);
   }
   char** value;
+  // char** tester;
   char gongjuren[201];
  private:
   // next_[0] is the lowest level link (level 0).  Higher levels are
@@ -737,7 +751,9 @@ InlineSkipList<Comparator>::AllocateNode(size_t key_size, int height) {
   // raw + prefix, and holds the bottom-mode (level 0) skip list pointer
   // next_[0].  key_size is the bytes for the key, which comes just after
   // the Node.
+
   char* raw = allocator_->AllocateAligned(prefix + sizeof(Node) + key_size);
+  // std::cout << sizeof(Node) << std::endl;
   Node* x = reinterpret_cast<Node*>(raw + prefix);
 
   // Once we've linked the node into the skip list we don't actually need
@@ -868,7 +884,7 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* 
   // std::cout << value << std::endl;
   Node* x = reinterpret_cast<Node*>((const_cast<char*>(keyy))) - 1;
 //  x->Update(value);i
-//  std::cout << sizeof(value) << std::endl;
+ std::cout << sizeof(char**) << std::endl;
   // std::cout << x->value << std::endl;
   // memcpy(x->value, value, 8);
   // x->value = new char*; // 分配一个指向 char* 类型的指针
@@ -880,7 +896,7 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* 
   // std::cout << x->value << std::endl;
   //  if (x->value == NULL) std::cout << 1 << std::endl; 
   x->value = value;
-  std::cout << x->value << std::endl;
+  // std::cout << x->value << std::endl;
   // x->value = value;
   // std::cout << x->value << std::endl;
   // std::cout << x->value << std::endl;
@@ -895,7 +911,7 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* 
 //  Node* x = reinterpret_cast<Node*>((const_cast<char*>(keyy))) - 1; 
   //const DecodedKey key_decoded = compare_.decode_key(keyy);
   int height = x->UnstashHeight();
- std::cout << height << std::endl;
+//  std::cout << height << std::endl;
   assert(height >= 1 && height <= kMaxHeight_);
   //std::cout << x->Key() <<std::endl;
   int max_height = max_height_.load(std::memory_order_relaxed);

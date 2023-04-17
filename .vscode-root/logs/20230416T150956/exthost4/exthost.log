@@ -1,0 +1,8 @@
+[2023-04-16 19:52:30.288] [exthost] [info] Extension host with pid 59675 started
+[2023-04-16 19:52:30.395] [exthost] [info] $resolveAuthority invoked for authority (ssh-remote)
+[2023-04-16 19:52:30.423] [exthost] [info] ExtensionService#_doActivateExtension ms-vscode-remote.remote-ssh, startup: false, activationEvent: 'onResolveRemoteAuthority:ssh-remote'
+[2023-04-16 19:52:37.591] [exthost] [info] Eager extensions activated
+[2023-04-16 19:52:37.693] [exthost] [info] ExtensionService#_doActivateExtension vscode.microsoft-authentication, startup: false, activationEvent: 'onAuthenticationRequest:microsoft'
+[2023-04-16 19:52:38.216] [exthost] [info] ExtensionService#_doActivateExtension vscode.github-authentication, startup: false, activationEvent: 'onAuthenticationRequest:github'
+[2023-04-16 19:52:44.127] [exthost] [info] Extension host terminating: received terminate message from renderer
+[2023-04-16 19:52:44.163] [exthost] [info] Extension host with pid 59675 exiting with code 0

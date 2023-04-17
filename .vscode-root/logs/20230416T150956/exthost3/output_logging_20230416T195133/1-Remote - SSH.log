@@ -1,0 +1,38 @@
+[19:51:33.335] Log Level: 2
+[19:51:33.339] remote-ssh@0.90.1
+[19:51:33.339] linux x64
+[19:51:33.363] SSH Resolver called for "ssh-remote+hust02", attempt 1
+[19:51:33.364] "remote.SSH.useLocalServer": true
+[19:51:33.364] "remote.SSH.path": undefined
+[19:51:33.364] "remote.SSH.configFile": undefined
+[19:51:33.364] "remote.SSH.useFlock": true
+[19:51:33.365] "remote.SSH.lockfilesInTmp": false
+[19:51:33.365] "remote.SSH.localServerDownload": auto
+[19:51:33.365] "remote.SSH.remoteServerListenOnSocket": false
+[19:51:33.365] "remote.SSH.showLoginTerminal": false
+[19:51:33.365] "remote.SSH.defaultExtensions": []
+[19:51:33.365] "remote.SSH.loglevel": 2
+[19:51:33.366] "remote.SSH.enableDynamicForwarding": true
+[19:51:33.366] "remote.SSH.enableRemoteCommand": false
+[19:51:33.366] "remote.SSH.serverPickPortsFromRange": {}
+[19:51:33.366] "remote.SSH.serverInstallPath": {}
+[19:51:33.373] SSH Resolver called for host: hust02
+[19:51:33.373] Setting up SSH remote "hust02"
+[19:51:33.379] Acquiring local install lock: /tmp/vscode-remote-ssh-d8136d83-install.lock
+[19:51:33.400] Looking for existing server data file at /home/xyw/Documents/Code/rocksdb/rdma/skiplist_of_memtable_in_rocksdb/.vscode-root/User/globalStorage/ms-vscode-remote.remote-ssh/vscode-ssh-host-d8136d83-784b0177c56c607789f9638da7b6bf3230d47a8c-0.90.1/data.json
+[19:51:33.402] Found local server running: {"remoteListeningOn":{"port":33579},"osReleaseId":"ubuntu","arch":"x86_64","webUiAccessToken":"","sshAuthSock":"","display":"","tmpDir":"/run/user/1001","platform":"linux","connectionToken":"11111111-1a11-1aa1-a1aa-11aa1a111aaa","pid":59432,"ipcHandlePath":"/tmp/vscode-ssh-askpass-40a29089d0bb14e1cee718fab95e0b3a19666e0b.sock","socksPort":33343,"startupTime":1681645538067}
+[19:51:33.410] Found running server - short-circuiting install
+[19:51:33.415] Starting forwarding server. localPort 34811 -> socksPort 33343 -> remotePort 33579
+[19:51:33.415] Forwarding server listening on 34811
+[19:51:33.416] Waiting for ssh tunnel to be ready
+[19:51:33.417] [Forwarding server 34811] Got connection 0
+[19:51:33.419] Tunneled 33579 to local port 34811
+[19:51:33.419] Resolved "ssh-remote+hust02" to "127.0.0.1:34811"
+[19:51:33.436] ------
+
+
+
+
+[19:51:33.453] [Forwarding server 34811] Got connection 1
+[19:52:03.420] Failed to set up socket for dynamic port forward to remote port 33579: Proxy connection timed out. Is the remote port correct?
+[19:52:03.454] Failed to set up socket for dynamic port forward to remote port 33579: Proxy connection timed out. Is the remote port correct?

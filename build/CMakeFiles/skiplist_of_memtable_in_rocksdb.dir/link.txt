@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/skiplist_of_memtable_in_rocksdb.dir/test/skiplist_test.cc.o  -o skiplist_of_memtable_in_rocksdb  -lgtest -lgtest_main -pthread -lrocksdb 
