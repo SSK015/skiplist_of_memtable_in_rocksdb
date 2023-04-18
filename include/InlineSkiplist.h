@@ -62,7 +62,7 @@ class InlineSkipList {
  private:
   struct Node;
   struct Splice;
-
+  struct Ptr;
  public:
   using DecodedKey =
       typename std::remove_reference<Comparator>::type::DecodedType;
@@ -163,7 +163,7 @@ class InlineSkipList {
 
     // Returns the key at the current position.
     // REQUIRES: Valid()
-    const char* key() const;
+    char* key();
 
     char** value();
 
@@ -284,18 +284,7 @@ class InlineSkipList {
 //char key_get[24];
 //char value_get[501];
 // template <class Comparator>
-/*struct Ptr {
-  // The invariant of a Splice is that prev_[i+1].key <= prev_[i].key <
-  // next_[i].key <= next_[i+1].key for all i.  That means that if a
-  // key is bracketed by prev_[i] and next_[i] then it is bracketed by
-  // all higher levels.  It is _not_ required that prev_[i]->Next(i) ==
-  // next_[i] (it probably did at some point in the past, but intervening
-  // or concurrent operations might have inserted nodes in between).
-  int length_;
-  // Node** prev_;
-  // Node** next_;
-  Node* node_ptr_;
-};*/
+
 template <class Comparator>
 struct InlineSkipList<Comparator>::Splice {
   // The invariant of a Splice is that prev_[i+1].key <= prev_[i].key <
@@ -336,17 +325,18 @@ struct InlineSkipList<Comparator>::Node {
   // to SetNext or NoBarrier_SetNext.
   int UnstashHeight() const {
     int rv;
+    // auto tmp = next_[0] + 8;
     memcpy(&rv, &next_[0], sizeof(int));
     return rv;
   }
 
-  const char* Key() const { 
+  char* Key() { 
 	  auto ret = &next_[1];
 	  //char key[24];
 //	  memcpy(key_get, ret, 24);
 //	  return reinterpret_cast<const char*>(&next_[1]);
 //	  std::cout << key_get << std::endl;
-	  return reinterpret_cast<const char*>(ret);
+	  return (char*)(ret);
   }
   void Update(char* valuee) const {
 //	memcpy(value, valuee, sizeof(valuee));
@@ -404,9 +394,11 @@ struct InlineSkipList<Comparator>::Node {
     NoBarrier_SetNext(level, prev->NoBarrier_Next(level));
     prev->SetNext(level, this);
   }
-  char** value;
+  
+  // char** value;
   // char** tester;
-  char gongjuren[201];
+  // std::aligned_storage<32, 8>::type reserved;
+  // char gongjuren[201];
  private:
   // next_[0] is the lowest level link (level 0).  Higher levels are
   // stored _earlier_, so level 1 is at next_[-1].
@@ -416,8 +408,24 @@ struct InlineSkipList<Comparator>::Node {
 //  char** value;
 //  char** value;
   // char** gongjuren;
+  // public:
+  // char hp[32];
+  // char** value;
+  // std::aligned_storage<32, 8>::type reserved;
 };
-
+template <class Comparator>
+struct InlineSkipList<Comparator>::Ptr {
+  // The invariant of a Splice is that prev_[i+1].key <= prev_[i].key <
+  // next_[i].key <= next_[i+1].key for all i.  That means that if a
+  // key is bracketed by prev_[i] and next_[i] then it is bracketed by
+  // all higher levels.  It is _not_ required that prev_[i]->Next(i) ==
+  // next_[i] (it probably did at some point in the past, but intervening
+  // or concurrent operations might have inserted nodes in between).
+  int length_;
+  // Node** prev_;
+  // Node** next_;
+  Node* node_ptr_;
+};
 template <class Comparator>
 inline InlineSkipList<Comparator>::Iterator::Iterator(
     const InlineSkipList* list) {
@@ -437,7 +445,7 @@ inline bool InlineSkipList<Comparator>::Iterator::Valid() const {
 }
 
 template <class Comparator>
-inline const char* InlineSkipList<Comparator>::Iterator::key() const {
+inline char* InlineSkipList<Comparator>::Iterator::key() {
   assert(Valid());
   return node_->Key();
 }
@@ -445,7 +453,13 @@ inline const char* InlineSkipList<Comparator>::Iterator::key() const {
 template <class Comparator>
 inline char** InlineSkipList<Comparator>::Iterator::value() {
   assert(Valid());
-  return node_->value;
+  char* tmp0 = reinterpret_cast<char*>(node_);
+  // char* tmp0 = node_->Key();
+  char** pptr = reinterpret_cast<char**>(&tmp0[38]);
+  std::cout << pptr << std::endl;
+  // char** tmp = &tmp0;
+  return pptr;
+  // return node_->Key() + 30;
 }
 
 template <class Comparator>
@@ -738,7 +752,10 @@ InlineSkipList<Comparator>::InlineSkipList(const Comparator cmp,
 
 template <class Comparator>
 char* InlineSkipList<Comparator>::AllocateKey(size_t key_size) {
+  // return reinterpret_cast<char*>(AllocateNode(key_size, RandomHeight())); 
   return const_cast<char*>(AllocateNode(key_size, RandomHeight())->Key());
+  // std::cout << &seee << std::endl;
+  // return const_cast<char*>(AllocateNode(key_size, RandomHeight()));
 }
 
 template <class Comparator>
@@ -751,9 +768,14 @@ InlineSkipList<Comparator>::AllocateNode(size_t key_size, int height) {
   // raw + prefix, and holds the bottom-mode (level 0) skip list pointer
   // next_[0].  key_size is the bytes for the key, which comes just after
   // the Node.
-
+  // char* _ptr = allocator_->AllocateAligned(sizeof(Ptr));
+  // Ptr* tmp_x =  reinterpret_cast<Ptr*>(_ptr);
+  // tmp_x->length_ = height;
+  // tmp_x->node_ptr_ = 
   char* raw = allocator_->AllocateAligned(prefix + sizeof(Node) + key_size);
+  // std::cout << prefix << std::endl;
   // std::cout << sizeof(Node) << std::endl;
+  // std::cout << key_size << std::endl; 30
   Node* x = reinterpret_cast<Node*>(raw + prefix);
 
   // Once we've linked the node into the skip list we don't actually need
@@ -884,7 +906,12 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* 
   // std::cout << value << std::endl;
   Node* x = reinterpret_cast<Node*>((const_cast<char*>(keyy))) - 1;
 //  x->Update(value);i
- std::cout << sizeof(char**) << std::endl;
+  auto kkey = x->Key();
+  char* vvx = reinterpret_cast<char*>(x);
+  memcpy(vvx + 38, value, 8);
+  vvx[32] = '\0';
+  vvx[46] = '\0';
+//  std::cout << sizeof(char**) << std::endl;
   // std::cout << x->value << std::endl;
   // memcpy(x->value, value, 8);
   // x->value = new char*; // 分配一个指向 char* 类型的指针
@@ -895,7 +922,21 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* 
   // std::cout << value << std::endl;
   // std::cout << x->value << std::endl;
   //  if (x->value == NULL) std::cout << 1 << std::endl; 
-  x->value = value;
+  // x->value = value;
+  std::cout << kkey << std::endl;
+  // std::cout << &x->value << std::endl;
+  // char** pashion;
+  // memcpy(pashion, vvx[38], 8);
+ char** pptr = reinterpret_cast<char**>(&vvx[38]);
+    // std::cout << value << std::endl;
+    std::cout << pptr << std::endl;
+    std::cout << *pptr << std::endl;
+  // std::cout << pashion << std::endl;
+  // std::cout << &x->tester << std::endl;
+  // std::cout << kkey << std::endl;
+  // void* vx = reinterpret_cast<void*>(x);
+  // std::cout << vx << std::endl;
+  // std::cout << &kkey << std::endl;
   // std::cout << x->value << std::endl;
   // x->value = value;
   // std::cout << x->value << std::endl;
@@ -1012,7 +1053,7 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* 
     RecomputeSpliceLevels(key_decoded, splice, recompute_height);
   }
   // x->value = value;
-  std::cout << x->value << std::endl;
+  // std::cout << x->value << std::endl;
   bool splice_is_valid = true;
   if (UseCAS) {
     // std::cout << x->value << std::endl;
@@ -1095,11 +1136,11 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* 
       // }
       splice->prev_[i]->SetNext(i, x);
       // std::cout << x->value << std::endl;
-       if (x->value != value) {
-        std::cout << i << std::endl;
-        std::cout << "error!" << std::endl;
+      //  if (x->value != value) {
+        // std::cout << i << std::endl;
+        // std::cout << "error!" << std::endl;
         // x->value = value;
-      }
+      // }
     }
   }
   // std::cout << x->value << std::endl;

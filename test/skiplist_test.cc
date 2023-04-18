@@ -22,7 +22,7 @@
 // #include "util/hash.h"
 #include "util/random.h"
   struct kv{
-   char key[30];
+   char key[50];
    char val[70];
 } KV[100001];
 int answer[1000001];
@@ -282,12 +282,12 @@ std::set<std::string, std::less<>> keys;
 		char* buf = list.AllocateKey(sizeof(KV[qqq].key));
                 // std::cout << 1 << std::endl;
                 memcpy(buf, KV[qqq].key, sizeof(KV[qqq].key));  // 将复制后的内容写入 buf
-                buf[24] = '\0';  // 添加字符串结束符
+                // buf[24] = '\0';  // 添加字符串结束符
 //	std::cout << KV[qqq].key << " " << KV[qqq].val << std::endl;
 //              memcpy(KV[qq].key, buf, 24); 
 //             std::cout << std::string(buf) << std::endl;
                 // KV[qqq].val = &KV[qqq].val;
-                // auto vv = KV[qqq++].val;
+                // auto vv = KV[qqq++].ser075374692946054659.��B�Uval;
                 // char* vv = &(KV[qqq++].val);
                 // std::cout << qqq << std::endl;
                 // std::cout << vv[qqq] << std::endl;
