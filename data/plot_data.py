@@ -30,9 +30,9 @@ for key, value in count_dict.items():
 plt.bar(numbers, counts)
 
 # 添加标签和标题
-plt.xlabel('数字')
-plt.ylabel('出现次数')
-plt.title('数字出现次数统计图')
+plt.xlabel('Seconds')
+plt.ylabel('counts')
+plt.title('Query Measure')
 
 plt.xlim([0,20])
 

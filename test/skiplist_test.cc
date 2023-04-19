@@ -383,11 +383,11 @@ std::set<std::string, std::less<>> keys;
   // vptr[cnnt + 1] = *ans;
   //  char* str = <char*>(ans);
   // str = static_cast<char*>(ans);
-  std::cout << cnnt + 1 << std::endl;
+  // std::cout << cnnt + 1 << std::endl;
 
-   std::cout << ans << std::endl;
-   std::cout << tmp_key[cnnt + 1] << std::endl;
-   std::cout << *ans << std::endl;
+  //  std::cout << ans << std::endl;
+  //  std::cout << tmp_key[cnnt + 1] << std::endl;
+  //  std::cout << *ans << std::endl;
   //  void* ano = reinterpret_cast<void*>(0x561c868d1dd8);
   //  char* strr = static_cast<char*>(ano);
   ptr[cnnt + 1] = ans;
@@ -420,7 +420,7 @@ std::set<std::string, std::less<>> keys;
         // str=NULL;
     // }
   fin1.close(); 
-  std::cout << 1 << std::endl;
+  // std::cout << 1 << std::endl;
   // for (int i = 1; i <= 1000000; ++i) {
     // if (i == 131648) {
     // std::cout << i << std::endl;

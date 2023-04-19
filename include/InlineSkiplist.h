@@ -456,7 +456,7 @@ inline char** InlineSkipList<Comparator>::Iterator::value() {
   char* tmp0 = reinterpret_cast<char*>(node_);
   // char* tmp0 = node_->Key();
   char** pptr = reinterpret_cast<char**>(&tmp0[38]);
-  std::cout << pptr << std::endl;
+  // std::cout << pptr << std::endl;
   // char** tmp = &tmp0;
   return pptr;
   // return node_->Key() + 30;
@@ -923,14 +923,14 @@ bool InlineSkipList<Comparator>::Insert(const char* keyy, char** value, Splice* 
   // std::cout << x->value << std::endl;
   //  if (x->value == NULL) std::cout << 1 << std::endl; 
   // x->value = value;
-  std::cout << kkey << std::endl;
+  // std::cout << kkey << std::endl;
   // std::cout << &x->value << std::endl;
   // char** pashion;
   // memcpy(pashion, vvx[38], 8);
  char** pptr = reinterpret_cast<char**>(&vvx[38]);
     // std::cout << value << std::endl;
-    std::cout << pptr << std::endl;
-    std::cout << *pptr << std::endl;
+    // std::cout << pptr << std::endl;
+    // std::cout << *pptr << std::endl;
   // std::cout << pashion << std::endl;
   // std::cout << &x->tester << std::endl;
   // std::cout << kkey << std::endl;
