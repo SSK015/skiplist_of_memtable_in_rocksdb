@@ -9,8 +9,8 @@
 #include "util/ibv_print_info.h"
 
 const int MR_SIZE = 1024;
-const int SERVER_SOCK_PORT = 32214;
-const char* SERVER_ADDR = "192.168.2.2";
+global const int SERVER_SOCK_PORT = 32214;
+global const char* SERVER_ADDR = "192.168.153.129";
 
 // information needed to exchange with peer to establish connection
 struct peer_info {
