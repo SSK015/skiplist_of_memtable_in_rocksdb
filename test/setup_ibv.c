@@ -9,16 +9,17 @@
 #include "util/ibv_print_info.h"
 #include "setup_ibv.h"
 
-extern const int SERVER_SOCK_PORT = 32214;
-extern const char* SERVER_ADDR = "192.168.153.129";
+extern const int SERVER_SOCK_PORT;
+extern const char* SERVER_ADDR;
 
-void print_peer_info(struct peer_info* peer) {
+extern void print_peer_info(struct peer_info* peer); 
+/*{
     printf("-------------------- peer info --------------------\n");
     printf("peer lid: %#hx\n", peer->lid);
     printf("peer qpn: %#x\n", peer->qpn);
     printf("peer psn: %#x\n", peer->psn);
     printf("peer gid: %#llx %#llx\n", peer->gid.global.subnet_prefix, peer->gid.global.interface_id);
-}
+}*/
 
 // server listen on socket
 static int server_exchange_peer_info(struct peer_info* mine, struct peer_info* peer) {
