@@ -1,3 +1,0 @@
-/home/xyw/Documents/Code/rocksdb/rdma/skiplist_of_memtable_in_rocksdb/test/build/CMakeFiles/rebuild_cache.dir
-/home/xyw/Documents/Code/rocksdb/rdma/skiplist_of_memtable_in_rocksdb/test/build/CMakeFiles/edit_cache.dir
-/home/xyw/Documents/Code/rocksdb/rdma/skiplist_of_memtable_in_rocksdb/test/build/CMakeFiles/ibv_test.dir

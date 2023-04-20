@@ -1,1 +1,0 @@
-/usr/bin/cc    CMakeFiles/ibv_test.dir/ibv_test.c.o CMakeFiles/ibv_test.dir/setup_ibv.c.o CMakeFiles/ibv_test.dir/ibv_print_info.c.o  -o ibv_test  -libverbs 
